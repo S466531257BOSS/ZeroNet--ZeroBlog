@@ -7,7 +7,7 @@ class ZeroBlog extends ZeroFrame
 		@event_page_load = $.Deferred()
 		@event_site_info = $.Deferred()
 
-		# Editable items on own site
+		# Bearbeitbare Teile der eigenen Site
 		$.when(@event_page_load, @event_site_info).done =>
 			if @site_info.settings.own or @data.demo
 				@addInlineEditors()
@@ -30,8 +30,8 @@ class ZeroBlog extends ZeroFrame
 
 
 	loadData: (query="new") ->
-		# Get blog parameters
-		if query == "old" # Old type query for pre 0.3.0
+		# Erhalte Blog Parameter
+		if query == "old" # Abfrage alten Typs für vor 0.3.0
 			query = "SELECT key, value FROM json LEFT JOIN keyvalue USING (json_id) WHERE path = 'data.json'"
 		else
 			query = "SELECT key, value FROM json LEFT JOIN keyvalue USING (json_id) WHERE directory = '' AND file_name = 'data.json'"
@@ -87,7 +87,7 @@ class ZeroBlog extends ZeroFrame
 			$(".posts .new").on "click", => # Create new blog post
 				@cmd "fileGet", ["data/data.json"], (res) =>
 					data = JSON.parse(res)
-					# Add to data
+					# Ergänze zu Daten
 					data.post.unshift
 						post_id: data.next_post_id
 						title: "New blog post"
@@ -95,7 +95,7 @@ class ZeroBlog extends ZeroFrame
 						body: "Blog post body"
 					data.next_post_id += 1
 
-					# Create html elements
+					# Erstelle Html Elemente
 					elem = $(".post.template").clone().removeClass("template")
 					@applyPostdata(elem, data.post[0])
 					elem.hide()
@@ -109,10 +109,10 @@ class ZeroBlog extends ZeroFrame
 	# - EOF Pages -
 
 
-	# All page content loaded
+	# Alle Seiten-Inhalte geladen
 	pageLoaded: =>
-		$("body").addClass("loaded") # Back/forward button keep position support
-		$('pre code').each (i, block) -> # Higlight code blocks
+		$("body").addClass("loaded") # Zurück/Vorwärts Knopf behält Positions Unterstützung
+		$('pre code').each (i, block) -> # Code Blöcke hervorheben
 			hljs.highlightBlock(block)
 		@event_page_load.resolve()
 		@cmd "innerLoaded", true
@@ -129,7 +129,7 @@ class ZeroBlog extends ZeroFrame
 		@logEnd "Adding inline editors"
 
 
-	# Check if publishing is necessary
+	# Prüfe ob Veröffentlichen notwendig ist
 	checkPublishbar: ->
 		if not @data["modified"] or @data["modified"] > @site_info.content.modified
 			$(".publishbar").addClass("visible")
@@ -137,28 +137,28 @@ class ZeroBlog extends ZeroFrame
 			$(".publishbar").removeClass("visible")
 
 
-	# Sign and Publish site
+	# Site eintragen und veröffentlichen
 	publish: =>
-		if @site_info.privatekey # Privatekey stored in users.json
+		if @site_info.privatekey # privater Schlüssel gespeichert in users.json
 			@cmd "sitePublish", ["stored"], (res) =>
 				@log "Publish result:", res
 		else
-			@cmd "wrapperPrompt", ["Enter your private key:", "password"], (privatekey) => # Prompt the private key
+			@cmd "wrapperPrompt", ["Enter your private key:", "password"], (privatekey) => # Abfrage des privaten Schlüssels
 				$(".publishbar .button").addClass("loading")
 				@cmd "sitePublish", [privatekey], (res) =>
 					$(".publishbar .button").removeClass("loading")
 					@log "Publish result:", res
 
-		return false # Ignore link default event
+		return false # Ignoriere Vorgabe-Ereignis der Verknüpfung
 
 
-	# Apply from data to post html element
+	# Wende von Daten auf Artikel Html Element an
 	applyPostdata: (elem, post, full=false) ->
 		title_hash = post.title.replace(/[#?& ]/g, "+").replace(/[+]+/g, "+")
 		elem.data("object", "Post:"+post.post_id)
 		$(".title .editable", elem).html(post.title).attr("href", "?Post:#{post.post_id}:#{title_hash}").data("content", post.title)
 		date_published = Time.since(post.date_published)
-		# Published date
+		# Datum der Veröffentlichung
 		if post.body.match /^---/m # Has more over fold
 			date_published += " &middot; #{Time.readtime(post.body)}" # If has break add readtime
 			$(".more", elem).css("display", "inline-block").attr("href", "?Post:#{post.post_id}:#{title_hash}")
