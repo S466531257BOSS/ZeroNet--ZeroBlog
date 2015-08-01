@@ -10,7 +10,7 @@ class Comments extends Class
 
 		$(".certselect").on "click", =>
 			if Page.server_info.rev < 160
-				Page.cmd "wrapperNotification", ["error", "Comments requires at least ZeroNet 0.3.0 Please upgade!"]
+				Page.cmd "wrapperNotification", ["error", "Kommentare erfordern zu mindest ZeroNet 0.3.0 Bitte aufrüsten!"]
 			else
 				Page.cmd "certSelect", [["zeroid.bit"]]
 			return false
@@ -31,11 +31,11 @@ class Comments extends Class
 				user_address = comment.directory.replace("users/", "")
 				comment_address = "#{comment.comment_id}_#{user_address}"
 				elem = $("#comment_"+comment_address)
-				if elem.length == 0 # Create if not exits
+				if elem.length == 0 # Erstelle falls nicht existent
 					elem = $(".comment.template").clone().removeClass("template").attr("id", "comment_"+comment_address).data("post_id", @post_id)
 					if type != "noanim"
 						elem.cssSlideDown()
-					$(".reply", elem).on "click", (e) => # Reply link
+					$(".reply", elem).on "click", (e) => # Erwidern-Verknüpfung
 						return @buttonReply $(e.target).parents(".comment")
 				@applyCommentData(elem, comment)
 				elem.appendTo(".comments")
@@ -63,16 +63,16 @@ class Comments extends Class
 		post_id = elem.attr("id")
 		body_add = "> [#{user_name}](\##{post_id}): "
 		elem_quote = $(".comment-body", elem).clone()
-		$("blockquote", elem_quote).remove() # Remove other people's quotes
+		$("blockquote", elem_quote).remove() # Entferne anderer Leute Benennungen
 		body_add+= elem_quote.text().trim("\n").replace(/\n/g, "\n> ")
 		body_add+= "\n\n"
 		$(".comment-new .comment-textarea").val( $(".comment-new .comment-textarea").val()+body_add )
-		$(".comment-new .comment-textarea").trigger("input").focus() # Autosize
+		$(".comment-new .comment-textarea").trigger("input").focus() # AutoGröße
 		return false 
 
 
 	submitComment: ->
-		if not Page.site_info.cert_user_id # Not registered
+		if not Page.site_info.cert_user_id # Nicht registriert
 			Page.cmd "wrapperNotification", ["info", "Please, select your account."]
 			return false
 
@@ -86,7 +86,7 @@ class Comments extends Class
 		Page.cmd "fileGet", {"inner_path": inner_path, "required": false}, (data) =>
 			if data
 				data = JSON.parse(data)
-			else # Default data
+			else # Vorgabe Daten
 				data = {"next_comment_id": 1, "comment": [], "comment_vote": {} }
 
 			data.comment.push {
@@ -115,8 +115,8 @@ class Comments extends Class
 			$(".comment-new").addClass("comment-nocert")
 			$(".comment-new .user_name").text("Please sign in")
 
-		if $(".comment-new .user_name").text() != last_cert_user_id or type == "updaterules" # User changed
-			# Update used/allowed space
+		if $(".comment-new .user_name").text() != last_cert_user_id or type == "updaterules" # Nutzer geändert
+			# Aktualisiere genutzten/gestatteten Raum
 			if Page.site_info.cert_user_id
 				Page.cmd "fileRules", "data/users/#{Page.site_info.auth_address}/content.json", (rules) =>
 					@rules = rules
@@ -139,7 +139,7 @@ class Comments extends Class
 
 	autoExpand: (elem) ->
 		editor = elem[0]
-		# Autoexpand
+		# AutoAusdehnen
 		if elem.height() > 0 then elem.height(1)
 
 		elem.on "input", =>
@@ -152,11 +152,11 @@ class Comments extends Class
 				new_height -= parseFloat elem.css("paddingTop")
 				new_height -= parseFloat elem.css("paddingBottom")
 
-				min_height = parseFloat(elem.css("lineHeight"))*2 # 2 line minimum
+				min_height = parseFloat(elem.css("lineHeight"))*2 # 2 Zeilen Minimum
 				if new_height < min_height then new_height = min_height+4
 
 				elem.height(new_height-4)
-			# Update used space
+			# Aktualisiere genutzten Raum
 			if @rules.max_size
 				if elem.val().length > 0
 					current_size = @rules.current_size + elem.val().length + 90
