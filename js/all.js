@@ -50,15 +50,15 @@
                 cell    = Math.floor((size - (margin * 2)) / 5),
                 image   = new PNGlib(size, size, 256);
 
-            // light-grey background
+            // hell-grauer HinterGrund
             var bg      = image.color(240, 240, 240);
 
-            // foreground is last 7 chars as hue at 50% saturation, 70% brightness
+            // VorderGrund ist letzte 7 Zeichen ( [0x]ffffff ) als Farbton bei 50% Sättigung ( [0].5 ), 70% Helligkeit ( [0].7 )
             var rgb     = this.hsl2rgb(parseInt(hash.substr(-7), 16) / 0xfffffff, .5, .7),
                 fg      = image.color(rgb[0] * 255, rgb[1] * 255, rgb[2] * 255);
 
-            // the first 15 characters of the hash control the pixels (even/odd)
-            // they are drawn down the middle first, then mirrored outwards
+            // die ersten 15 Zeichen des hash steuern die Pixel (gerade/ungerade)
+            // Sie werden zunächst zur Mitte gezeichnet, dann außerhalb gespiegelt
             var i, color;
             for (i = 0; i < 15; i++) {
                 color = parseInt(hash.charAt(i), 16) % 2 ? bg : fg;
@@ -85,7 +85,7 @@
             }
         },
 
-        // adapted from: https://gist.github.com/aemkei/1325937
+        // übernommen von: https://gist.github.com/aemkei/1325937
         hsl2rgb: function(h, s, b){
             h *= 6;
             s = [
@@ -315,7 +315,7 @@
 
 
 /**
-* A handy class to calculate color values.
+* Eine handliche Klasse um FarbWerte zu berechnen
 *
 * @version 1.0
 * @author Robert Eisele <robert@xarg.org>
@@ -327,7 +327,7 @@
 
 (function() {
 
-	// helper functions for that ctx
+	// Helfer-Funktionen für dieses ctx
 	function write(buffer, offs) {
 		for (var i = 2; i < arguments.length; i++) {
 			for (var j = 0; j < arguments[i].length; j++) {
@@ -354,24 +354,24 @@
 		this.height  = height;
 		this.depth   = depth;
 
-		// pixel data and row filter identifier size
+		// Pixel-Daten und Reihen-Filter-Identifizierungs-Größe
 		this.pix_size = height * (width + 1);
 
 		// deflate header, pix_size, block headers, adler32 checksum
 		this.data_size = 2 + this.pix_size + 5 * Math.floor((0xfffe + this.pix_size) / 0xffff) + 4;
 
-		// offsets and sizes of Png chunks
-		this.ihdr_offs = 0;									// IHDR offset and size
+		// Absätze und Größen der Png-Stückel
+		this.ihdr_offs = 0;					// IHDR AbSatz und Größe
 		this.ihdr_size = 4 + 4 + 13 + 4;
-		this.plte_offs = this.ihdr_offs + this.ihdr_size;	// PLTE offset and size
+		this.plte_offs = this.ihdr_offs + this.ihdr_size;	// PLTE AbSatz und Größe
 		this.plte_size = 4 + 4 + 3 * depth + 4;
-		this.trns_offs = this.plte_offs + this.plte_size;	// tRNS offset and size
+		this.trns_offs = this.plte_offs + this.plte_size;	// tRNS AbSatz und Größe
 		this.trns_size = 4 + 4 + depth + 4;
-		this.idat_offs = this.trns_offs + this.trns_size;	// IDAT offset and size
+		this.idat_offs = this.trns_offs + this.trns_size;	// IDAT AbSatz und Größe
 		this.idat_size = 4 + 4 + this.data_size + 4;
-		this.iend_offs = this.idat_offs + this.idat_size;	// IEND offset and size
+		this.iend_offs = this.idat_offs + this.idat_size;	// IEND AbSatz und Größe
 		this.iend_size = 4 + 4 + 4;
-		this.buffer_size  = this.iend_offs + this.iend_size;	// total PNG size
+		this.buffer_size  = this.iend_offs + this.iend_size;	// gesamte PNG Größe
 
 		this.buffer  = new Array();
 		this.palette = new Object();
@@ -379,12 +379,12 @@
 
 		var _crc32 = new Array();
 
-		// initialize buffer with zero bytes
+		// Initialisiere Puffer mit Null-Bytes
 		for (var i = 0; i < this.buffer_size; i++) {
 			this.buffer[i] = "\x00";
 		}
 
-		// initialize non-zero elements
+		// Initialisiere Nicht-Null-Elemente
 		write(this.buffer, this.ihdr_offs, byte4(this.ihdr_size - 12), 'IHDR', byte4(width), byte4(height), "\x08\x03");
 		write(this.buffer, this.plte_offs, byte4(this.plte_size - 12), 'PLTE');
 		write(this.buffer, this.trns_offs, byte4(this.trns_size - 12), 'tRNS');
@@ -423,14 +423,14 @@
 			_crc32[i] = c;
 		}
 
-		// compute the index into a png for a given pixel
+		// Errechne den Index in ein png für ein gegebenes Pixel
 		this.index = function(x,y) {
 			var i = y * (this.width + 1) + x + 1;
 			var j = this.idat_offs + 8 + 2 + 5 * Math.floor((i / 0xffff) + 1) + i;
 			return j;
 		}
 
-		// convert a color and build up the palette
+		// konvertiere eine Farbe und erstelle die Palette
 		this.color = function(red, green, blue, alpha) {
 
 			alpha = alpha >= 0 ? alpha : 255;
@@ -451,7 +451,7 @@
 			return this.palette[color];
 		}
 
-		// output a PNG string, Base64 encoded
+		// Ausgabe einer PNG-ZeichenKette, Base64 enkodiert
 		this.getBase64 = function() {
 
 			var s = this.getDump();
@@ -475,12 +475,12 @@
 			return r;
 		}
 
-		// output a PNG string
+		// Ausgabe einer PNG-ZeichenKette
 		this.getDump = function() {
 
-			// compute adler32 of output pixels + row filter bytes
-			var BASE = 65521; /* largest prime smaller than 65536 */
-			var NMAX = 5552;  /* NMAX is the largest n such that 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1 */
+			// errechne adler32 der ausgegebenen Pixel + Reihen-Filter-Bytes
+			var BASE = 65521; /* größte Prim kleiner als 65536 */
+			var NMAX = 5552;  /* NMAX ist das größte n von 255n(n+1)/2 + (n+1)(BASE-1) <= 2^32-1 */
 			var s1 = 1;
 			var s2 = 0;
 			var n = NMAX;
@@ -500,7 +500,7 @@
 			s2%= BASE;
 			write(this.buffer, this.idat_offs + this.idat_size - 8, byte4((s2 << 16) | s1));
 
-			// compute crc32 of the PNG chunks
+			// Errechne crc32 der PNG Stückel
 			function crc32(png, offs, size) {
 				var crc = -1;
 				for (var i = 4; i < size-4; i += 1) {
@@ -515,7 +515,7 @@
 			crc32(this.buffer, this.idat_offs, this.idat_size);
 			crc32(this.buffer, this.iend_offs, this.iend_size);
 
-			// convert PNG to string
+			// Konvertiere PNG zu ZeichenKette
 			return "\211PNG\r\n\032\n"+this.buffer.join('');
 		}
 	}
