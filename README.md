@@ -1,5 +1,5 @@
 # ZeroBlog
-Demo for decentralized, self publishing blogging platform.
+Demo einer dezentralisierten, selbst-publizierenden Blogging-Platform.
 
 ## Screenshot
 
